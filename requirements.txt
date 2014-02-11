@@ -1,0 +1,12 @@
+django>=1.5,<1.6
+South==0.8.1
+django-crispy-forms
+django-dajax==0.9.2
+django-dajaxice==0.5.5
+django-widget-tweaks==1.3
+-e git://github.com/luk156/django-webodt@637d3122914e3c38f51266a01d89943f7ae920d2#egg=django_webodt-dev
+lxml==3.2.1
+-e hg+http://bitbucket.org/bkroeze/django-livesettings/#egg=django-livesettings
+#abiword # (per la conversione in pdf)
+-e git+https://github.com/bartTC/django-attachments
+django-keyedcache

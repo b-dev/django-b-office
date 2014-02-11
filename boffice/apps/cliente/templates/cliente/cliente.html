@@ -1,0 +1,231 @@
+{% extends "base.html" %}
+{% load widget_tweaks %}
+
+{% block breadcrumb %}
+<li><a href="/">Home</a> <span class="divider">/</span></li>
+<li><a href="{% url 'minimo.cliente.views.clienti' %}">Elenco Clienti</a> <span class="divider">/</span></li>
+<li><a href="#">{{c}}</a></li>
+{% endblock %}
+
+
+{% block meta_title %}Dettaglio cliente{% endblock %}
+{% block title %}<i class="icon-user"></i> Dettaglio Cliente {% endblock%}
+
+{% block js %}
+	<script>
+		function CancellaCliente() {
+				if ( confirm("Vuoi veramente cancellare il Cliente {{c.ragione_sociale}}?") ) {
+						document.location.href = "{% url 'minimo.cliente.views.eliminacliente' c.id %}";
+						}
+				}
+	</script>
+
+{% endblock %}
+
+
+{% block main %}
+
+<h3>Informazioni:</h3>
+<table class="table">
+	<tr>
+		<td><h5>Ragione sociale</h5></td>
+		<td>{{c.ragione_sociale}}</td>
+	</tr>
+	<tr>
+		<td><h5>Indirizzo</h5></td>
+		<td>{{c.indirizzo}}</td>
+	</tr>
+	<tr>
+		<td><h5>Codice Fiscale</h5></td>
+		<td>{{c.cod_fiscale}}</td>
+	</tr>
+	<tr>
+		<td><h5>Partita IVA</h5></td>
+		<td>{{c.p_iva}}</td>
+	</tr>
+	<tr>
+		<td><h5>Telefono</h5></td>
+		<td>{{c.telefono}}</td>
+	</tr>
+	<tr>
+		<td><h5>E-Mail</h5></td>
+		<td>{{c.mail}}</td>
+	</tr>
+</table>
+
+<h3>Altri contatti:</h3>
+<table class="table table-striped" id="fatture">
+	<thead>
+		<tr>
+			<th></th>
+			<th></th>
+			<th></th>
+			<th></th>
+			<th></th>
+		</tr>
+	</thead>
+	<tbody>
+		{% for atom in c.contatti %}
+			<tr>
+				<td>{{atom.riferimento}}</td>
+				<td>{{atom.tipo}}:</td>
+				<td>{{atom.valore}}</td>
+				<td>
+				<div class="btn-group">
+					<a {% if f.stato %} href="#" {% else %} href="{% url 'minimo.cliente.views.modificaatom' atom.id %}" {% endif %} class="btn  btn-small {% if f.stato %} disabled {% endif %}"><i class="icon-edit"></i> modifica</a>
+					<a {% if f.stato %} href="#" {% else %} href="{% url 'minimo.cliente.views.eliminaatom' atom.id %}" {% endif %} class="btn  btn-small {% if f.stato %} disabled {% endif %}"><i class="icon-trash"></i> elimina</a>
+				</div>
+			</td>
+			</tr>
+		{% endfor %}
+		<tr>
+			<form  method="post" action="{% url 'minimo.cliente.views.nuovoatom' c.id %}">{% csrf_token %}
+			<td>
+				<div class="input-append">
+					{% render_field form.riferimento %}<span class="add-on"><i class="icon-user"></i></span>
+				</div>
+			</td>
+			<td>
+				<div class="input-append">
+					{% render_field form.tipo %}<span class="add-on"></span>
+				</div>
+			</td>
+			<td>
+				<div class="input-append">
+					{% render_field form.valore %}<span class="add-on"></i></span>
+				</div>
+			</td>
+			<td>
+				<input type="submit" name="save" value="Aggiungi" class="btn btn-primary btn-primary" id="submit-id-save"/> </form>
+			</td>
+			</form>
+		</tr>
+	</tbody>
+</table>
+<h3>Documenti:</h3>
+
+<div class="large-12 columns">
+</br>
+<div class="tabbable"> <!-- Only required for left/right tabs -->
+    <ul class="nav nav-tabs">
+		<li class="active"><a href="#tab-1" data-toggle="tab">Fatture</a></li>
+		<li><a href="#tab-2" data-toggle="tab">Ritenute</a></li>
+		<li><a href="#tab-3" data-toggle="tab">Preventivi</a></li>
+		<li><a href="#tab-4" data-toggle="tab">Ordini</a></li>
+    </ul>
+    <div class="tab-content">
+		<div class="tab-pane fade in active" id="tab-1">
+			<table class="table table-striped" id="fatture">
+				<thead>
+					<tr>
+						<th>ID</th>
+						<th>Data</th>
+						<th>Totale</th>
+						<th>Pagata</th>
+					</tr>
+				</thead>
+				<tbody>
+					{% for fattura in fa %}
+						<tr>
+							<td><a href="{% url 'minimo.documento.views.dettagli_documento' fattura.id %}" ><i class="icon-search"> </i> 
+								{{fattura}}</a></td>
+							<td>{{fattura.data}}</td>
+							<td>{{fattura.totale}} €</td>
+							<td>
+								{% if fattura.stato %}<i class="icon-check"></i>
+								{% else %}<i class="icon-check-empty"></i>{% endif %}
+							</td>
+						</tr>
+					{% endfor %}
+				</tbody>
+			</table>
+		</div>
+		<div class="tab-pane fade in " id="tab-2">
+			<table class="table table-striped" id="ritenute">
+				<thead>
+					<tr>
+						<th>ID</th>
+						<th>Data</th>
+						<th>Totale</th>
+						<th>Pagata</th>
+					</tr>
+				</thead>
+				<tbody>
+					{% for doc in ra %}
+						<tr>
+							<td><a href="{% url 'minimo.documento.views.dettagli_documento' doc.id %}" ><i class="icon-search"> </i> 
+								{{doc}}</a></td>
+							<td>{{doc.data}}</td>
+							<td>{{doc.totale}} €</td>
+							<td>
+								{% if doc.stato %}<i class="icon-check"></i>
+								{% else %}<i class="icon-check-empty"></i>{% endif %}
+							</td>
+						</tr>
+					{% endfor %}
+				</tbody>
+			</table>
+		</div>
+		<div class="tab-pane fade in " id="tab-3">
+			<table class="table table-striped" id="preventivi">
+				<thead>
+					<tr>
+						<th>ID</th>
+						<th>Data</th>
+						<th>Totale</th>
+						<th>Pagata</th>
+					</tr>
+				</thead>
+				<tbody>
+					{% for doc in pr %}
+						<tr>
+							<td><a href="{% url 'minimo.documento.views.dettagli_documento' doc.id %}" ><i class="icon-search"> </i> 
+								{{doc}}</a></td>
+							<td>{{doc.data}}</td>
+							<td>{{doc.totale}} €</td>
+							<td>
+								{% if doc.stato %}<i class="icon-check"></i>
+								{% else %}<i class="icon-check-empty"></i>{% endif %}
+							</td>
+						</tr>
+					{% endfor %}
+				</tbody>
+			</table>
+		</div>
+		<div class="tab-pane fade in " id="tab-4">
+			<table class="table table-striped" id="ordini">
+				<thead>
+					<tr>
+						<th>ID</th>
+						<th>Data</th>
+						<th>Totale</th>
+						<th>Pagata</th>
+					</tr>
+				</thead>
+				<tbody>
+					{% for doc in or %}
+						<tr>
+							<td><a href="{% url 'minimo.documento.views.dettagli_documento' doc.id %}" ><i class="icon-search"> </i> 
+								{{doc}}</a></td>
+							<td>{{doc.data}}</td>
+							<td>{{doc.totale}} €</td>
+							<td>
+								{% if doc.stato %}<i class="icon-check"></i>
+								{% else %}<i class="icon-check-empty"></i>{% endif %}
+							</td>
+						</tr>
+					{% endfor %}
+				</tbody>
+			</table>
+		</div>
+	</div>
+</div>
+
+{% endblock %}
+
+{% block left %}
+<h4>Azioni</h4>
+<a href="{% url 'minimo.cliente.views.modificacliente' c.id %}" class="btn btn-block "><i class="icon-edit"></i> modifica</a>
+<a href="#" class="btn btn-block " onClick="CancellaCliente();"><i class="icon-trash"></i> elimina</a>
+
+{% endblock%}
